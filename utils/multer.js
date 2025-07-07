@@ -1,25 +1,26 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('./cloudinary'); // your cloudinary.js config
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = './uploads/';
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'json_uploads', // your desired folder name in Cloudinary
+    resource_type: 'raw',   // VERY IMPORTANT for .json and non-image files
+    format: async (req, file) => 'json', // optional but helpful
+    public_id: (req, file) => `${Date.now()}-${file.originalname}`
   }
 });
 
-const upload = multer({ 
+const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    if (path.extname(file.originalname) === '.json') {
+    if (file.mimetype === 'application/json') {
       cb(null, true);
     } else {
       cb(new Error('Only JSON files are allowed'), false);
     }
   }
 });
+
+module.exports = upload;
