@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3001;
 app.get('/', (req, res) => {
   res.status(200).json({
     status : 'success',
-    message: 'Welcome to the demo-mohab project!'
+    message: 'Welcome to the demo-mohab project! This is the server side.',
   });
 });
 
